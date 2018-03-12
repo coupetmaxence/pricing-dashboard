@@ -5,12 +5,16 @@
 #include <future>
 #include <chrono>
 #include <ctime>
+#include <fstream>
+#include <math.h>
+#include <nlopt.h>
 
 #include "derivatives/Derivative.h"
 #include "derivatives/European_Option.h"
 #include "derivatives/Asian_Option.h"
 #include "tools/json.hpp"
 #include "pricing/Monte_Carlo.h"
+#include "derivatives/Bond.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -25,11 +29,19 @@ int main(int argc, char* argv[])
     {
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
         const int NBR_THREADS = 100;
-        const int NBR_SIMULATIONS = 100000;
+        const int NBR_SIMULATIONS = 10000;
         const int NBR_STEPS = 100;
-
-        Derivative* option = new Asian_Option(Call, 40, 40, 1, 0.2, 0.01, 0, 0);
-
+        
+        ifstream i("../pricer/message.json");
+        json j;
+        i >> j;
+        
+        Bond bond(100, j["data"]["maturity"], j["data"]["maturity"],
+                j["data"]["risk_free"]);
+        double pric = bond.price();        
+        Derivative* option = new European_Option(Call, j["data"]["price"], 
+                j["data"]["price"], j["data"]["maturity"], j["data"]["std"], 
+                j["data"]["risk_free"], 0, 0);
 
         vector<packaged_task<double(Derivative*,int,int)>> tasks(NBR_THREADS);
         vector<future<double>> values(NBR_THREADS);
