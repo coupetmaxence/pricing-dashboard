@@ -14,7 +14,8 @@ protected:
     double N, floor, cap, participation;
 public:
     Capital_Protection_Certificate(double p_s0, double p_t, double p_sigma,
-            double p_r, double p_q, double p_N, std::string solve_for)
+            double p_r, double p_q, double p_N, std::string solve_for,
+            double arg1, double arg2, double arg3)
 };
 }
 
